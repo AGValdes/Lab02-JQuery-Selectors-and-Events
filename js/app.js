@@ -1,56 +1,107 @@
 'use strict';
+
 let imageArray = [];
+let titleDropDownArray = [];
+let hornDropDownArray = [];
 
 function Image(image) {
-  this.image_url = image.image_url;
-  this.title = image.title;
-  this.description = image.description;
-  this.keyword = image.keyword;
-  this.horns = image.horns;
+  for (let key in image) {
+    this[key] = image[key];
+  }
 }
+
+// function Image(image) {
+//   this.image_url = image.image_url;
+//   this.title = image.title;
+//   this.description = image.description;
+//   this.keyword = image.keyword;
+//   this.horns = image.horns;
+// }
 
 Image.prototype.render = function () {
-  let $imageClone = $('#photo-template').clone();
+  let template = $('#photo-template').html();
+  let html = Mustache.render(template, this);
+  // $('main').append(html);
 
-  $('main').append($imageClone);
+  return html;
+  
+  // let $imageClone = $('#photo-template').clone();
 
-  $imageClone.find('img').attr('src', this.image_url);
-  $imageClone.find('h2').text(this.title);
-  $imageClone.find('p').text(this.description);
-  $imageClone.attr('class', this.keyword);
-  $imageClone.removeClass('photo-template');
+
+  // $('main').append($imageClone);
+
+  // $imageClone.find('img').attr('src', this.image_url);
+  // $imageClone.find('h2').text(this.title);
+  // $imageClone.find('p').text(this.description);
+  // $imageClone.attr('class', this.keyword);
+  // $imageClone.removeClass('photo-template');
 }
 
-function populateDropDown() {
+// imageArray.forEach(image => {
+//   $('#photo-template').append(image.toHtml());
+// });
+
+function populateTitleDropDown() {
+  console.log(titleDropDownArray);
+  titleDropDownArray.forEach(item => {
+    $('#titleDropDown').append(`<option value= ${item}>${item}</option>`);
+  });
+}
+
+function populateHornDropDown() {
   imageArray.forEach(item => {
-    console.log(item);
-    $('select').append(`<option value= ${item}>${item}</option>`);
+    $('#hornDropDown').append(`<option value= ${item.horns}>${item.horns}</option>`);
   });
 }
 
 Image.readJson = () => {
   const ajaxSettings = { method: 'get', dataType: 'json' };
-
+  if (document.URL.includes('index.html')) {
   $.ajax('data/page-1.json', ajaxSettings)
     .then(data => {
       data.forEach(item => {
-        if (!imageArray.includes(item.keyword)) {
-          imageArray.push(item.keyword);
+        if (!titleDropDownArray.includes(item.keyword)) {
+          titleDropDownArray.push(item.keyword);
+          // hornDropDownArray.push(item.horns);
         }
-        let renderedImage = new Image(item);
-        renderedImage.render();
+        imageArray.push(new Image(item));
+        // renderedImage.render();
       });
-      populateDropDown();
+      imageArray.forEach(item => {
+        $('#imageContainer').append(item.render());
+      })
+      populateTitleDropDown();
+      populateHornDropDown();
     })
+} else {
+  $.ajax('data/page-2.json', ajaxSettings)
+    .then(data => {
+      data.forEach(item => {
+        if (!titleDropDownArray.includes(item.keyword)) {
+          titleDropDownArray.push(item.keyword);
+          // hornDropDownArray.push(item.horns);
+        }
+        imageArray.push(new Image(item));
+        // renderedImage.render();
+      });
+      imageArray.forEach(item => {
+      $('#imageContainer').append(item.render());
+    })
+      populateTitleDropDown();
+      populateHornDropDown();
+    });
 }
-$(() => Image.readJson());
+}
 
-$('section').toggle(false);
-
-
+// $('section').toggle(false);
 
 $('select').on('change', function () {
-  $('section').toggle(false);
-  let grabKeyword = $(this).find(':selected').attr('value');
-  $(`.${grabKeyword}`).toggle();
+  // $('section').toggle(false);
+  let grabKeyword = $(this).val();
+  // .find(':selected').attr('value');
+  console.log(grabKeyword);
+  $('div').hide();
+  $(`div.${grabKeyword}`).fadeIn();
 });
+
+$(() => Image.readJson());

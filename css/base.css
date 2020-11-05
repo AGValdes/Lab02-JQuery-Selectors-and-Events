@@ -1,9 +1,29 @@
 img {
   width: 200px;
   height: 200px;
-  display: inline-block;
-  float: left;
+} 
 
 *{
   font-family: 'Itim', cursive;
+  text-align: center;
+  background-color: slategray
+}
+
+#imageContainer{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+div{
+  text-align: center;
+  width: 500px;
+  margin: 10px;
+  border: 3px groove rgb(46, 46, 94);
+  background-color: thistle;
+}
+
+h2, p{
+  background-color: thistle;
 }
